@@ -1,35 +1,25 @@
 # -*- coding: utf-8 -*-
 """
 __author__ = "Ashiquzzaman Khan"
-__desc__ = "Execution file to create deploy or add functionality"
+__desc__ = "Main Execution file for the Command line"
 """
 import argparse
+from core.commands import Invoker, Receiver
+from core.commands.create_command import ConcreteCreateCommand
+from core.commands.make_command import ConcreteMakeCommand
 
-from core.commandparse import CreateOperation, Context
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     # required arguments
-    parser.add_argument("operation", help="Specify an operation (addfunc, make, stats)", choices=["create", "add", "make", "stats", "deploy"])
-    # optional arguments
-    parser.add_argument("--add", help="Add a functionality to the bot")
-    parser.add_argument("--make", help="create the Bot into the bot directory")
-    parser.add_argument("--stats", help="Show the statistics of the bot")
-    parser.add_argument("--deploy", help="Deploy the bot into discord")
-    parser.add_argument("--create", help="Create a source file of the bot")
+    parser.add_argument("operation", help="Specify an operation (addfunc, make, stats)", choices=["create", "make"])
+
     args = parser.parse_args()
 
-    _strategy_create = CreateOperation()
-    parser.create = Context(_strategy_create)
-    parser.create.context_interface()
-
-    # _strategy_add = AddOperation()
-    # parser.add = Context(_strategy_add)
-    # #
-    #
-    # _strategy_make = MakeOperation()
-    # parser.make = Context(_strategy_make)
-    # # parser.make.context_interface()
-    #
-    # _strategy_stats = StatsOperation()
-    # parser.stats = Context(_strategy_stats)
+    _invoker = Invoker()
+    _receiver = Receiver()
+    _create_command = ConcreteCreateCommand(_receiver)
+    _make_command = ConcreteMakeCommand(_receiver)
+    _invoker.store_command(_create_command)
+    _invoker.store_command(_make_command)
+    _invoker.execute_commands(args.operation)
